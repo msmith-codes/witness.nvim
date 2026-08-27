@@ -13,6 +13,8 @@ function M.register()
         local sub = cmd_opts.fargs[1]
         if sub == "review" or sub == nil then
             require("witness.review").open()
+        elseif sub == "commit" then
+            require("witness.commit").open()
         elseif sub == "reset" then
             require("witness.state").reset()
         else
@@ -21,7 +23,7 @@ function M.register()
     end, {
         nargs = "?",
         complete = function()
-            return { "review", "reset" }
+            return { "review", "commit", "reset" }
         end,
         desc = "Open or manage the witness.nvim hunk review list",
     })

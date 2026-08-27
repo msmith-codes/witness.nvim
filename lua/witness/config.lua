@@ -13,10 +13,28 @@ local defaults = {
         quit = "q",
     },
 
+    commit = {
+        keymaps = {
+            stage = "s",
+            unstage = "u",
+            stage_all = "S",
+            unstage_all = "U",
+            commit = "cc",
+            refresh = "R",
+            quit = "q",
+        },
+        -- Fraction of the editor's columns/lines the floating window uses.
+        width = 0.8,
+        height = 0.8,
+    },
+
     signs = {
         pending = "○",
         reviewed = "●",
         flagged = "!",
+        staged = "●",
+        unstaged = "○",
+        untracked = "?",
     },
 
     integration = {

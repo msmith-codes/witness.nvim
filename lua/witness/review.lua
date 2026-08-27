@@ -1,5 +1,6 @@
 local config = require("witness.config")
 local state = require("witness.state")
+local git = require("witness.git")
 
 local M = {}
 
@@ -22,40 +23,6 @@ local STATUS_HL = {
     reviewed = "String",
     flagged = "ErrorMsg",
 }
-
--- ============================================================
--- git plumbing
--- ============================================================
-
-local function git_root()
-    local out = vim.fn.systemlist({ "git", "rev-parse", "--show-toplevel" })
-    if vim.v.shell_error ~= 0 or vim.tbl_isempty(out) then
-        return nil
-    end
-    return out[1]
-end
-
-local function run_git(root, args)
-    local cmd = { "git", "-C", root }
-    vim.list_extend(cmd, args)
-    local out = vim.fn.systemlist(cmd)
-    if vim.v.shell_error ~= 0 then
-        return nil, table.concat(out, "\n")
-    end
-    return out
-end
-
--- Feeds `input_lines` to git on stdin, e.g. for `git apply` on a
--- hand-built single-hunk patch. `vim.fn.system()` joins a list input with
--- "\n" but does not add a trailing one, which git's patch parser treats as
--- a truncated (corrupt) last line — so the newline is added explicitly.
-local function run_git_with_stdin(root, args, input_lines)
-    local cmd = { "git", "-C", root }
-    vim.list_extend(cmd, args)
-    local input = table.concat(input_lines, "\n") .. "\n"
-    local out = vim.fn.system(cmd, input)
-    return vim.v.shell_error == 0, out
-end
 
 -- ============================================================
 -- diff parsing
@@ -117,14 +84,14 @@ end
 local function collect_hunks(root)
     local hunks = {}
 
-    local unstaged, unstaged_err = run_git(root, { "diff", "--no-color", "--unified=0", "--" })
+    local unstaged, unstaged_err = git.run(root, { "diff", "--no-color", "--unified=0", "--" })
     if unstaged then
         vim.list_extend(hunks, parse_diff(unstaged, "unstaged"))
     else
         vim.notify("witness.nvim: `git diff` failed\n" .. (unstaged_err or ""), vim.log.levels.ERROR)
     end
 
-    local staged, staged_err = run_git(root, { "diff", "--no-color", "--unified=0", "--cached", "--" })
+    local staged, staged_err = git.run(root, { "diff", "--no-color", "--unified=0", "--cached", "--" })
     if staged then
         vim.list_extend(hunks, parse_diff(staged, "staged"))
     else
@@ -373,7 +340,7 @@ local function stage_current()
         return
     end
 
-    local ok, err = run_git_with_stdin(session.root, { "apply", "--cached", "--unidiff-zero", "-" }, build_patch(hunk))
+    local ok, err = git.run_with_stdin(session.root, { "apply", "--cached", "--unidiff-zero", "-" }, build_patch(hunk))
     if not ok then
         vim.notify("witness.nvim: failed to stage hunk\n" .. err, vim.log.levels.ERROR)
         return
@@ -393,7 +360,7 @@ local function unstage_current()
         return
     end
 
-    local ok, err = run_git_with_stdin(
+    local ok, err = git.run_with_stdin(
         session.root,
         { "apply", "--cached", "--reverse", "--unidiff-zero", "-" },
         build_patch(hunk)
@@ -496,7 +463,7 @@ function M.open()
         )
     end
 
-    local root = git_root()
+    local root = git.root()
     if not root then
         vim.notify("witness.nvim: not inside a git repository", vim.log.levels.ERROR)
         return
