@@ -8,7 +8,28 @@
 
 </div>
 
-## Commands
+## Table of Contents
+* [Installation](#Installation)
+* [Getting Started](#Getting-Started)
+  * [Commands](#Commands)
+  * [Commit Window Keymaps](#Commit-Window-Keymaps)
+## Installation 
+* Neovim v0.12.5 required
+* Install using your favorite plugin manager. (Here I'm using `lazy.nvim`)
+```lua
+{
+    "msmith-codes/witness.nvim",
+    branch = "main",
+    dependencies = { "lewis6991/gitsigns.nvim" },
+    name = "witness.nvim",
+    cmd = "Witness",
+    opts = {},
+}
+```
+
+## Getting Started
+
+### Commands
 
 - `:Witness` / `:Witness review` — open the hunk review list (split window).
   Walk unstaged/staged hunks, mark them reviewed/flagged, and stage/unstage
@@ -19,7 +40,7 @@
 - `:Witness reset` — clear persisted hunk review state for the current
   project.
 
-### Commit window keymaps
+### Commit Window Keymaps
 
 | Key  | Action                          |
 |------|----------------------------------|
