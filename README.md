@@ -1,4 +1,12 @@
-# witness.nvim
+<div align="center">
+
+# Witness.nvim
+##### Manage your git with an easy to use window.
+
+![Lua](https://img.shields.io/badge/Lua-5.5-blue?style=flat&logo=lua)
+![Neovim](https://img.shields.io/badge/NeoVim-v0.12-green?style=flat&logo=neovim)
+
+</div>
 
 ## Commands
 
