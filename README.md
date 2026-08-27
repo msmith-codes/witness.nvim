@@ -29,6 +29,7 @@
 
 ## Getting Started
 
+
 ### Commands
 
 - `:Witness` / `:Witness review` — open the hunk review list (split window).
